@@ -3,6 +3,7 @@
 A retrieval-augmented generation (RAG) system that answers questions about off-campus housing in Gainesville, FL for University of Florida students. Ask it about rent prices, bus routes, apartment reviews, neighborhoods, and which complexes are popular with the Indian student community — and get grounded answers cited to real documents.
 
 **GitHub:** https://github.com/Jugal-JG/ai201-project1-unofficial-guide-starter  
+**Demo Video:** https://drive.google.com/file/d/1ls-RJvFhqUwKJivR0duEa60JBQtvfJR3/view?usp=sharing  
 **Run the app:** `python app.py` → open `http://localhost:5000`
 
 ---
