@@ -34,6 +34,10 @@ Off-campus housing in Gainesville, FL for University of Florida students. This k
 | 12 | ForRentUniversity — UF Off-Campus Housing | Aggregator listing apartments near UF with pricing, photos, and availability filters | https://www.forrentuniversity.com/University-of-Florida |
 | 13 | Quora — Best Areas in Gainesville for UF Students | Community Q&A covering neighborhood comparisons from current and former UF students | https://www.quora.com/What-areas-of-Gainsville-are-the-most-pleasant-to-live-for-a-UF-student |
 | 14 | UF PHHP — Living in Gainesville | Graduate student-focused housing and neighborhood guide from UF's College of Public Health | https://phhp.ufl.edu/admissions/living-in-gainesville/ |
+| 15 | Stoneridge Apartments | Large 366-unit complex at 3800 SW 34th St; popular with Indian community, 2–3 BR units, close to UF and Santa Fe College | https://www.stoneridgegainesville.com/ |
+| 16 | Centric on 34th Apartments | 119-unit community at SW 39th Blvd off 34th St; 2–3 BR, in-unit laundry, near Butler Plaza; popular with Indian graduate students | https://centricaptsgainesville.com/ |
+| 17 | The Quarters Gainesville | Large student complex at 4000 SW 37th Blvd near 34th St; 3–4 BR furnished units, pool, study labs, 10-min bus to UF | https://thequartersgainesville.com/ |
+| 18 | Greenwich Green Apartments | Complex on SW 39th Blvd near 34th St corridor; 1–3 BR, on-site RTS bus stop, tennis/basketball courts, ~2 miles from UF | https://www.greenwichgreen.net/ |
 
 ---
 
