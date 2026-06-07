@@ -123,7 +123,7 @@ flowchart LR
 - **Embedding:** `SentenceTransformer("all-MiniLM-L6-v2").encode()` called on each chunk. Runs locally, no API key needed.
 - **Vector Store:** ChromaDB persistent collection stored in `./chroma_db/`. Each chunk stored with embedding + source URL metadata.
 - **Retrieval:** `collection.query(query_embeddings=[...], n_results=5)` returns top-5 chunks by cosine similarity.
-- **Generation:** Retrieved chunks injected into a system prompt as context. Claude generates a grounded answer citing sources. Model: `claude-haiku-4-5-20251001`.
+- **Generation:** Retrieved chunks injected into a system prompt as context. Groq generates a grounded answer citing sources. Model: `llama-3.3-70b-versatile` via Groq API.
 - **Interface:** Simple `while True` input loop in `main.py`. User types a question, system prints the answer, loop repeats until "quit".
 
 ---
@@ -137,4 +137,4 @@ I will give Claude the **Chunking Strategy** section and the **Architecture** st
 I will give Claude the **Retrieval Approach** section and the Architecture diagram, then ask it to implement `embed_and_store(chunks)` (uses `sentence-transformers` to embed each chunk and upserts into a ChromaDB persistent collection) and `retrieve(query, k=5)` (embeds the query string and calls `collection.query()`). I'll verify by running `retrieve("bus routes near 34th street")` and manually checking that the top results reference RTS routes or 34th Street apartments from our document set — not unrelated content.
 
 **Milestone 5 — Generation and interface:**
-I will give Claude the full `planning.md` (Domain + Architecture + Retrieval Approach sections), the Anthropic SDK docs for basic `messages.create()` usage, and ask it to implement `generate_answer(query, chunks)` that builds a system prompt with the retrieved chunks as context and calls the Claude API, plus a `main()` CLI loop. I'll verify against the 5 evaluation questions in the Evaluation Plan, checking that each answer mentions at least one specific fact traceable to a retrieved source chunk.
+I will give Claude the full `planning.md` (Domain + Architecture + Retrieval Approach sections), the Groq SDK docs for `chat.completions.create()` usage, and ask it to implement `generate_answer(query, chunks)` that builds a grounded system prompt with the retrieved chunks as context and calls `llama-3.3-70b-versatile` via the Groq API (`GROQ_API_KEY` from `.env`), plus a Flask web interface (`app.py`) with a mobile-compatible UI. I'll verify against the 5 evaluation questions in the Evaluation Plan, checking that each answer cites specific source filenames and that a question outside the document scope returns "I don't have enough information."
