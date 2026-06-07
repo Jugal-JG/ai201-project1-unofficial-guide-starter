@@ -61,9 +61,16 @@ def build_context(chunks: list[dict]) -> str:
     return "\n\n".join(parts)
 
 
-def ask(question: str, k: int = TOP_K) -> dict:
+def ask(question: str, k: int = TOP_K,
+        history: list[dict] | None = None) -> dict:
     """
     Retrieve top-k chunks for the question, then generate a grounded answer.
+
+    Args:
+        question: The current user question.
+        k:        Number of chunks to retrieve.
+        history:  Optional list of previous turns, each {"question": str, "answer": str}.
+                  Last 3 turns are included so follow-up questions have context.
 
     Returns:
         {
@@ -72,18 +79,33 @@ def ask(question: str, k: int = TOP_K) -> dict:
             "chunks":  list[dict],   # raw retrieved chunks with distances
         }
     """
-    chunks = retrieve(question, k=k)
+    # For short follow-up questions, augment the retrieval query with the
+    # last turn's question so ChromaDB searches the right topic area.
+    retrieval_query = question
+    if history and len(question.split()) <= 10:
+        retrieval_query = history[-1]["question"] + " " + question
+
+    chunks = retrieve(retrieval_query, k=k)
     context = build_context(chunks)
 
-    user_message = f"CONTEXT DOCUMENTS:\n{context}\n\nQUESTION: {question}"
+    # Build message list: system prompt, then interleaved history, then current question
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+    # Inject up to last 3 prior turns as real chat turns so the model has memory
+    for turn in (history or [])[-3:]:
+        messages.append({"role": "user",      "content": turn["question"]})
+        messages.append({"role": "assistant", "content": turn["answer"]})
+
+    # Current turn: context documents + new question
+    messages.append({
+        "role": "user",
+        "content": f"CONTEXT DOCUMENTS:\n{context}\n\nQUESTION: {question}"
+    })
 
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
     response = client.chat.completions.create(
         model=GROQ_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user",   "content": user_message},
-        ],
+        messages=messages,
         temperature=0.2,   # low temperature keeps answers factual and consistent
         max_tokens=512,
     )

@@ -356,6 +356,7 @@ HTML = """<!DOCTYPE html>
 
 <script>
   let turnCount = 0;
+  let chatHistory = [];   // [{question, answer}, ...] — sent with each request
 
   function setQuery(el) {
     const q = el.getAttribute("data-query") || el.textContent.trim();
@@ -407,7 +408,7 @@ HTML = """<!DOCTYPE html>
     fetch("/ask", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ question: q }),
+      body:    JSON.stringify({ question: q, history: chatHistory }),
     })
     .then(r => r.json())
     .then(data => {
@@ -432,6 +433,9 @@ HTML = """<!DOCTYPE html>
           <div>${chunkItems}</div>
         </details>
       `;
+
+      // Save this completed turn to history for follow-up questions
+      chatHistory.push({ question: q, answer: data.answer });
     })
     .catch(() => {
       turn.querySelector(".answer-bubble").innerHTML =
@@ -445,12 +449,13 @@ HTML = """<!DOCTYPE html>
   }
 
   function newChat() {
-    // Clear conversation
+    // Clear conversation and reset history
     document.getElementById("chat-thread").innerHTML = "";
     document.getElementById("question").value = "";
     document.getElementById("chips").style.display = "flex";
     document.getElementById("new-chat-bar").classList.remove("visible");
     turnCount = 0;
+    chatHistory = [];
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -488,7 +493,8 @@ def ask_route():
     if not question:
         return jsonify({"error": "question is required"}), 400
 
-    result = ask(question)
+    history = data.get("history") or []
+    result = ask(question, history=history)
     return jsonify({
         "answer":  result["answer"],
         "sources": result["sources"],
