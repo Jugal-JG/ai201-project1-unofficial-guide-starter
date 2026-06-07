@@ -144,29 +144,63 @@ HTML = """<!DOCTYPE html>
     }
     .chip:hover { background: #dde4f5; }
 
-    /* ---- Answer card ---- */
-    .answer-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px 20px;
-      display: none;
-      animation: fadeIn 0.3s ease;
+    /* ---- Chat thread ---- */
+    #chat-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 8px;
     }
-    .answer-card.visible { display: block; }
+
+    /* New chat bar */
+    .new-chat-bar {
+      display: none;
+      justify-content: flex-end;
+      margin-bottom: 4px;
+    }
+    .new-chat-bar.visible { display: flex; }
+    button#new-chat-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    button#new-chat-btn:hover { border-color: var(--gator-blue); color: var(--gator-blue); }
+
+    /* Individual Q&A turn */
+    .turn { animation: fadeIn 0.3s ease; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .answer-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
+    /* User bubble */
+    .user-bubble {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+    }
+    .user-bubble span {
+      background: var(--gator-blue);
+      color: #fff;
+      border-radius: 18px 18px 4px 18px;
+      padding: 10px 16px;
+      font-size: 0.93rem;
+      max-width: 85%;
+      line-height: 1.5;
+    }
+
+    /* Answer bubble */
+    .answer-bubble {
+      background: var(--card);
+      border-radius: 4px 18px 18px 18px;
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
     }
     .answer-text {
       font-size: 0.97rem;
@@ -177,17 +211,17 @@ HTML = """<!DOCTYPE html>
 
     /* ---- Sources section ---- */
     .sources-section {
-      margin-top: 18px;
-      padding-top: 14px;
+      margin-top: 14px;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
     }
     .sources-label {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
     .source-pill {
       display: inline-block;
@@ -196,18 +230,18 @@ HTML = """<!DOCTYPE html>
       color: #1a5c2e;
       border-radius: 20px;
       padding: 4px 12px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       margin: 3px 4px 3px 0;
     }
 
     /* ---- Chunks debug section ---- */
     details.chunks-debug {
-      margin-top: 16px;
+      margin-top: 12px;
       border-top: 1px solid var(--border);
-      padding-top: 12px;
+      padding-top: 10px;
     }
     details summary {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
       cursor: pointer;
       user-select: none;
@@ -218,7 +252,7 @@ HTML = """<!DOCTYPE html>
       border-radius: 8px;
       padding: 10px 12px;
       margin-top: 8px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       line-height: 1.6;
     }
     .chunk-meta {
@@ -267,6 +301,15 @@ HTML = """<!DOCTYPE html>
 <div class="orange-bar"></div>
 
 <main>
+  <!-- New Chat button — only visible after first message -->
+  <div class="new-chat-bar" id="new-chat-bar">
+    <button id="new-chat-btn" onclick="newChat()">+ New Chat</button>
+  </div>
+
+  <!-- Chat history thread — Q&A pairs stack here -->
+  <div id="chat-thread"></div>
+
+  <!-- Input card — stays at bottom -->
   <div class="search-card">
     <label for="question">What do you want to know?</label>
     <div class="input-row">
@@ -274,7 +317,8 @@ HTML = """<!DOCTYPE html>
         placeholder="e.g. Which apartments on 34th Street have bus access to UF?"></textarea>
       <button id="ask-btn" onclick="submitQuery()">Ask</button>
     </div>
-    <div class="chips">
+    <!-- Chips hidden after first message -->
+    <div class="chips" id="chips">
       <span class="chip" onclick="setQuery(this)"
         data-query="Which RTS bus routes serve apartments on the SW 34th Street corridor?">
         Bus routes on 34th Street
@@ -307,21 +351,6 @@ HTML = """<!DOCTYPE html>
       <span>Searching documents&hellip;</span>
     </div>
   </div>
-
-  <div class="answer-card" id="answer-card">
-    <div class="answer-label">Answer</div>
-    <div class="answer-text" id="answer-text"></div>
-
-    <div class="sources-section">
-      <div class="sources-label">Retrieved from</div>
-      <div id="sources-list"></div>
-    </div>
-
-    <details class="chunks-debug">
-      <summary>Show retrieved chunks (debug)</summary>
-      <div id="chunks-list"></div>
-    </details>
-  </div>
 </main>
 
 <footer>
@@ -330,8 +359,9 @@ HTML = """<!DOCTYPE html>
 </footer>
 
 <script>
+  let turnCount = 0;
+
   function setQuery(el) {
-    // Use data-query attribute if present, else fall back to visible text
     const q = el.getAttribute("data-query") || el.textContent.trim();
     document.getElementById("question").value = q;
     submitQuery();
@@ -343,11 +373,40 @@ HTML = """<!DOCTYPE html>
 
     const btn     = document.getElementById("ask-btn");
     const spinner = document.getElementById("spinner");
-    const card    = document.getElementById("answer-card");
 
     btn.disabled = true;
     spinner.classList.add("visible");
-    card.classList.remove("visible");
+
+    // Hide chips after first question
+    if (turnCount === 0) {
+      document.getElementById("chips").style.display = "none";
+    }
+
+    // Show "New Chat" button
+    document.getElementById("new-chat-bar").classList.add("visible");
+
+    // Build a placeholder turn immediately so user sees their question
+    turnCount++;
+    const turnId = "turn-" + turnCount;
+    const chunkId = "chunks-" + turnCount;
+
+    const thread = document.getElementById("chat-thread");
+    const turn = document.createElement("div");
+    turn.className = "turn";
+    turn.id = turnId;
+    turn.innerHTML = `
+      <div class="user-bubble"><span>${escapeHtml(q)}</span></div>
+      <div class="answer-bubble">
+        <div class="answer-text" style="color:var(--muted);font-style:italic;">Thinking&hellip;</div>
+      </div>
+    `;
+    thread.appendChild(turn);
+
+    // Clear input
+    document.getElementById("question").value = "";
+
+    // Scroll to the new turn
+    turn.scrollIntoView({ behavior: "smooth", block: "start" });
 
     fetch("/ask", {
       method:  "POST",
@@ -356,32 +415,47 @@ HTML = """<!DOCTYPE html>
     })
     .then(r => r.json())
     .then(data => {
-      document.getElementById("answer-text").textContent = data.answer;
+      const sourcePills = data.sources
+        .map(s => `<span class="source-pill">${s}</span>`).join("");
 
-      const srcEl = document.getElementById("sources-list");
-      srcEl.innerHTML = data.sources
-        .map(s => `<span class="source-pill">${s}</span>`)
-        .join("");
-
-      const chunkEl = document.getElementById("chunks-list");
-      chunkEl.innerHTML = data.chunks.map((c, i) => `
+      const chunkItems = data.chunks.map((c, i) => `
         <div class="chunk-item">
           <div class="chunk-meta">#${i+1} &mdash; ${c.source} &mdash; dist: ${c.distance}</div>
           ${escapeHtml(c.text.slice(0, 300))}${c.text.length > 300 ? "&hellip;" : ""}
         </div>
       `).join("");
 
-      card.classList.add("visible");
+      turn.querySelector(".answer-bubble").innerHTML = `
+        <div class="answer-text">${escapeHtml(data.answer)}</div>
+        <div class="sources-section">
+          <div class="sources-label">Retrieved from</div>
+          <div>${sourcePills}</div>
+        </div>
+        <details class="chunks-debug" id="${chunkId}">
+          <summary>Show retrieved chunks (debug)</summary>
+          <div>${chunkItems}</div>
+        </details>
+      `;
     })
-    .catch(err => {
-      document.getElementById("answer-text").textContent =
-        "Something went wrong. Please try again.";
-      card.classList.add("visible");
+    .catch(() => {
+      turn.querySelector(".answer-bubble").innerHTML =
+        `<div class="answer-text" style="color:#c0392b;">Something went wrong. Please try again.</div>`;
     })
     .finally(() => {
       btn.disabled = false;
       spinner.classList.remove("visible");
+      turn.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
+  }
+
+  function newChat() {
+    // Clear conversation
+    document.getElementById("chat-thread").innerHTML = "";
+    document.getElementById("question").value = "";
+    document.getElementById("chips").style.display = "flex";
+    document.getElementById("new-chat-bar").classList.remove("visible");
+    turnCount = 0;
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function escapeHtml(str) {
