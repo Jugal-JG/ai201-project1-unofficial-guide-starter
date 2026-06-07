@@ -314,7 +314,7 @@ HTML = """<!DOCTYPE html>
     <label for="question">What do you want to know?</label>
     <div class="input-row">
       <textarea id="question" rows="2"
-        placeholder="e.g. Which apartments on 34th Street have bus access to UF?"></textarea>
+        placeholder="e.g. What are the nearest apartments to UF campus?"></textarea>
       <button id="ask-btn" onclick="submitQuery()">Ask</button>
     </div>
     <!-- Chips hidden after first message -->
