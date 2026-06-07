@@ -10,11 +10,19 @@ Run:
 Then open: http://localhost:5000
 """
 
+import os
+
 from flask import Flask, request, jsonify, render_template_string
 
 from generate import ask
+from embed import build_vector_store, get_collection, CHROMA_DIR
 
 app = Flask(__name__)
+
+# Auto-build the vector store on first boot if it doesn't exist yet
+if not os.path.exists(CHROMA_DIR) or get_collection().count() == 0:
+    print("ChromaDB not found — building vector store (this takes ~60s on first run)...")
+    build_vector_store()
 
 # ---------------------------------------------------------------------------
 # HTML template — single-file, no external JS frameworks
