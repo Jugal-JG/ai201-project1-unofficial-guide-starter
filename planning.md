@@ -107,7 +107,7 @@ flowchart LR
     C["Embedding\n(sentence-transformers\nall-MiniLM-L6-v2)"]
     D["Vector Store\n(ChromaDB\nlocal persistent)"]
     E["Retrieval\n(ChromaDB query\ntop-k = 5)"]
-    F["Generation\n(Claude claude-haiku-4-5\nvia Anthropic SDK)"]
+    F["Generation\n(llama-3.3-70b-versatile\nvia Groq API)"]
     G["CLI Interface\n(Python input() loop)"]
 
     A --> B --> C --> D
