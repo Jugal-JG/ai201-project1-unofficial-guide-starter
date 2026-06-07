@@ -9,7 +9,7 @@
 
 ## Domain
 
-<!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
+Off-campus housing in Gainesville, FL for University of Florida students. This knowledge is hard to find through official channels because UF's housing office only covers on-campus options, while the real student experience — which complexes have mold problems, which landlords ignore maintenance requests, which neighborhoods flood, and what a fair price looks like — lives scattered across Reddit threads, Yelp reviews, ApartmentRatings posts, and word of mouth. A student trying to lease their first apartment has no single place to compare neighborhoods, bus access, price ranges, and landlord reputation at once.
 
 ---
 
@@ -20,16 +20,20 @@
 
 | # | Source | Description | URL or location |
 |---|--------|-------------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 | UF Off Campus Life — Housing Resources | Official UF off-campus housing portal with listings, tenant rights info, and neighborhood guides | https://offcampus.ufl.edu/resources/off-campus-housing/ |
+| 2 | Off Campus Universe — UF Housing Guide | Comprehensive student-written guide covering neighborhoods, pricing, and lease tips for Gainesville | https://www.offcampus-universe.com/post/student-apartments-gainesville-fl-where-to-live-off-campus-at-uf |
+| 3 | Sweetwater Gainesville — Best Student Apartments Guide | Ranked list of top student apartment complexes near UF with amenity comparisons and pricing tiers | https://sweetwatergainesville.com/resources/best-student-apartments-uf-gainesville/ |
+| 4 | Sweetwater Gainesville — Freshman Housing Guide | Advice for first-year students navigating on-campus vs off-campus decisions, updated for 2026 | https://sweetwatergainesville.com/resources/freshman-uf-housing/ |
+| 5 | prked.com — Ultimate UF Off-Campus Housing Guide | Detailed guide covering neighborhoods, Archer Road corridor, lease timing, and commute options | https://prked.com/post/the-ultimate-university-of-florida-off-campus-housing-guide |
+| 6 | Off Campus Universe — UF Off-Campus Housing Guide | Covers RTS bus routes, neighborhood safety, and walkability for UF students | https://www.offcampus-universe.com/post/uf-off-campus-housing-guide-for-students-in-gainesville |
+| 7 | Swamp Rentals — Apartments on Bus Routes | Lists Gainesville apartments served by RTS campus bus routes with route numbers | https://www.swamprentals.com/uf-parent-guide/apartments-in-gainesville-on-bus-route |
+| 8 | UF TAPS — Transportation & Parking | Official UF commuter and transit resource explaining the free RTS bus benefit for students | https://offcampus.ufl.edu/resources/transportation/ |
+| 9 | ApartmentRatings — Gainesville Place Apartments | Tenant reviews of a major student complex covering maintenance, staff, and living conditions | https://www.apartmentratings.com/fl/gainesville/gainesville-place-apartments_352271313132608/ |
+| 10 | Yelp — Student Apartments Gainesville FL | Aggregated student reviews of multiple Gainesville apartment complexes | https://www.yelp.com/search?find_desc=Student+Apartments&find_loc=Gainesville,+FL |
+| 11 | Yelp — UF Apartments Gainesville FL | Broader Yelp apartment search for UF-area complexes with ratings and reviews | https://www.yelp.com/search?find_desc=Uf+Apartments&find_loc=Gainesville%2C+FL |
+| 12 | ForRentUniversity — UF Off-Campus Housing | Aggregator listing apartments near UF with pricing, photos, and availability filters | https://www.forrentuniversity.com/University-of-Florida |
+| 13 | Quora — Best Areas in Gainesville for UF Students | Community Q&A covering neighborhood comparisons from current and former UF students | https://www.quora.com/What-areas-of-Gainsville-are-the-most-pleasant-to-live-for-a-UF-student |
+| 14 | UF PHHP — Living in Gainesville | Graduate student-focused housing and neighborhood guide from UF's College of Public Health | https://phhp.ufl.edu/admissions/living-in-gainesville/ |
 
 ---
 
