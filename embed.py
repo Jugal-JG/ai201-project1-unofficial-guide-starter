@@ -26,7 +26,7 @@ from ingest import build_chunks
 CHROMA_DIR = "./chroma_db"
 COLLECTION_NAME = "uf_housing"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-TOP_K = 5
+TOP_K = 8
 
 
 # ---------------------------------------------------------------------------

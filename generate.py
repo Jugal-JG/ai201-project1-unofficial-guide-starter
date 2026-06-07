@@ -23,7 +23,7 @@ from embed import retrieve
 load_dotenv()
 
 GROQ_MODEL = "llama-3.3-70b-versatile"
-TOP_K = 5
+TOP_K = 8
 
 # Human-readable source labels (strips numbering prefix and .txt suffix)
 def _label(source: str) -> str:

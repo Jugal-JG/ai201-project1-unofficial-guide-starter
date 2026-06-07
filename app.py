@@ -275,12 +275,30 @@ HTML = """<!DOCTYPE html>
       <button id="ask-btn" onclick="submitQuery()">Ask</button>
     </div>
     <div class="chips">
-      <span class="chip" onclick="setQuery(this)">Bus routes on 34th Street</span>
-      <span class="chip" onclick="setQuery(this)">Rent for a 4-bedroom near UF</span>
-      <span class="chip" onclick="setQuery(this)">When to start apartment hunting</span>
-      <span class="chip" onclick="setQuery(this)">Stoneridge maintenance reviews</span>
-      <span class="chip" onclick="setQuery(this)">Walkable neighborhoods near campus</span>
-      <span class="chip" onclick="setQuery(this)">Indian community apartments Gainesville</span>
+      <span class="chip" onclick="setQuery(this)"
+        data-query="Which RTS bus routes serve apartments on the SW 34th Street corridor?">
+        Bus routes on 34th Street
+      </span>
+      <span class="chip" onclick="setQuery(this)"
+        data-query="What is the typical monthly rent per person for a 4-bedroom apartment near UF campus in Gainesville?">
+        Rent for a 4-bedroom near UF
+      </span>
+      <span class="chip" onclick="setQuery(this)"
+        data-query="When should UF students start apartment hunting to secure a unit for the fall semester?">
+        When to start apartment hunting
+      </span>
+      <span class="chip" onclick="setQuery(this)"
+        data-query="What do residents say about maintenance response times at Stoneridge Apartments on SW 34th Street?">
+        Stoneridge maintenance reviews
+      </span>
+      <span class="chip" onclick="setQuery(this)"
+        data-query="Which Gainesville neighborhoods are walkable to UF campus without needing a car or bus?">
+        Walkable neighborhoods near campus
+      </span>
+      <span class="chip" onclick="setQuery(this)"
+        data-query="Which apartments on SW 34th Street in Gainesville are popular with Indian and South Asian students near UF?">
+        Indian community apartments
+      </span>
     </div>
     <div class="spinner" id="spinner">
       <div class="dot-flashing"></div>
@@ -313,7 +331,9 @@ HTML = """<!DOCTYPE html>
 
 <script>
   function setQuery(el) {
-    document.getElementById("question").value = el.textContent;
+    // Use data-query attribute if present, else fall back to visible text
+    const q = el.getAttribute("data-query") || el.textContent.trim();
+    document.getElementById("question").value = q;
     submitQuery();
   }
 
