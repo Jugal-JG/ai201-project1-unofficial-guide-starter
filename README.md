@@ -335,29 +335,33 @@ System output:
 | 1 | Which RTS bus routes serve apartments on the SW 34th Street corridor? | Routes 1, 9, 12, 34, 35, 38, 75 serve the corridor; students ride free with UF ID | Named Routes 9, 35, 38; mentioned Route 75 with caveat; cited SwampRentals correctly | Relevant | Partially accurate — Routes 1, 12, 34 not mentioned |
 | 2 | What do residents say about maintenance response times at Stoneridge Apartments? | Slow/inconsistent for non-urgent issues; building built 1977 | Correctly stated maintenance is slow for non-urgent; cited 2–3 week delays for small repairs; accurately noted 24hr response for AC emergencies | Partially relevant | Partially accurate — mixed Stoneridge-specific and Gainesville Place reviews |
 | 3 | When should UF students start apartment hunting for fall semester? | No later than February; best units lease Feb–May | Correctly said start in February; cited the Feb–May leasing window; mentioned 12-month-early signing | Relevant | Accurate |
-| 4 | What is the typical monthly rent per person for a 4-bedroom apartment near UF? | $560–$750/month all-inclusive | Gave $600–$900 range for 2BR shared; admitted 4BR specific range not found; estimated correctly | Partially relevant | Partially accurate — correct ballpark but cited 2BR pricing instead of 4BR |
+| 4 | What is the typical monthly rent per person for a 4-bedroom apartment near UF? | $560–$750/month all-inclusive | Correctly returned $560–$750/month all-inclusive citing The Quarters and ForRentUniversity | Relevant | Accurate |
 | 5 | Which Gainesville neighborhoods are walkable to UF without a car or bus? | University Ave corridor (5–10 min walk); Midtown (15–20 min walk); 34th St requires bus/bike | Correctly identified University Ave as walkable (5–10 min); mentioned Midtown; noted East Gainesville requires a longer walk | Relevant | Accurate |
 
 **Retrieval quality:** Relevant / Partially relevant / Off-target  
 **Response accuracy:** Accurate / Partially accurate / Inaccurate
 
-**Summary:** 2 fully accurate, 3 partially accurate, 0 inaccurate. The two partially accurate responses (Q1 and Q4) trace to the same root cause described below.
+**Summary:** 3 fully accurate, 2 partially accurate, 0 inaccurate. The partially accurate responses (Q1 and Q2) trace to the root causes described below.
 
 ---
 
 ## Failure Case Analysis
 
 **Question that failed (partially):**  
-*"What is the typical monthly rent per person for a 4-bedroom apartment near UF campus?"*
+*"What do residents say about maintenance response times at Stoneridge Apartments?"*
 
 **What the system returned:**  
-The model cited the $600–$900/month range for *shared two-bedroom* apartments instead of the specific 4-bedroom figure ($560–$750/month). It acknowledged the 4BR figure was not in its context, even though `12_forrentuniversity_uf.txt` contains the exact answer.
+> "Residents at Stoneridge Apartments report that maintenance can be slow for non-urgent issues. According to one review, maintenance can be slow, but another review from a different complex mentions that maintenance requests get handled within a day or two, though it's unclear if this applies to Stoneridge. At Stoneridge, the general sentiment is that maintenance is responsive for urgent issues but slower for less pressing concerns."
 
-**Root cause — chunk boundary split at retrieval stage:**  
-The ForRentUniversity document lists pricing in a structured table. The 4BR pricing section ("Per-person rent: $560–$680/month") and the Stoneridge amenities section ended up in the same chunk as unrelated Stoneridge listing details (bus stop, fitness center). When the embedding model encoded this mixed chunk, the vector became a blend of "apartment amenities" and "pricing" signals. The query "monthly rent 4-bedroom" matched the pricing portion of the chunk's meaning — but its embedding also partially matched "bus stop directly in front: Routes 9, 35" and other amenity content, diluting the similarity score. The more specific 4BR pricing chunk ranked 6th (distance 0.3444), behind less relevant chunks about lease signing and budget tips.
+The 2–3 week delay detail in the answer actually came from a review of **Gainesville Place Apartments** (`09_apartmentratings_gainesville_place.txt`), not Stoneridge. The model did hedge ("another review from a different complex"), but the answer still partially mis-attributes a different complex's review to Stoneridge.
+
+**Root cause — source contamination at the retrieval stage:**  
+The query "maintenance response times at Stoneridge Apartments" produced high cosine distances across the board (0.45–0.56) because Stoneridge has very few tenant-written maintenance reviews in the corpus — the Stoneridge website (`15_stoneridge_apartments.txt`) is a marketing page with no review content, and the Yelp chunk that mentions Stoneridge by name is embedded inside a larger chunk that also contains Trimark Properties reviews. The embedding model cannot separate them at query time.
+
+Because Stoneridge-specific maintenance content is sparse, the retrieval system cast a wide net and returned the second-closest semantic match: a Gainesville Place ApartmentRatings chunk (dist=0.4769) which has detailed maintenance reviews. This chunk was passed to the LLM alongside the genuine Stoneridge Yelp chunk. The model correctly flagged the ambiguity with "another review from a different complex" but still folded the Gainesville Place details into its summary.
 
 **What I would change to fix it:**  
-Switch to paragraph-boundary chunking for the ForRentUniversity and listing-aggregator documents. These documents have a clear structure — each pricing tier is a self-contained paragraph. Splitting on `\n\n` (double newline) rather than a fixed character count would keep the 4BR pricing block as one atomic chunk, giving it a clean embedding that ranks higher for pricing queries. Fixed-size chunking is a poor fit for structured listing data.
+Two approaches: (1) Add more Stoneridge-specific tenant review content to the corpus — the current Stoneridge document is a marketing page, not a review source. Adding reviews from ApartmentRatings or Google Reviews specifically for Stoneridge would give the retrieval system on-target chunks to find. (2) Add apartment complex name as a metadata field on each chunk during ingestion, and filter retrieval to only return chunks whose `complex` metadata matches the complex named in the query. This prevents reviews from a different complex from polluting the context even when cosine distances are high.
 
 ---
 
@@ -365,7 +369,7 @@ Switch to paragraph-boundary chunking for the ForRentUniversity and listing-aggr
 
 **One way the spec helped during implementation:**
 
-Writing the evaluation plan in `planning.md` before touching any code forced me to define what "correct" looks like for each query before I could accidentally tune the system to produce the answer I expected. Question 4 (4BR rent) had a specific expected answer of $560–$750/month from `planning.md`. When the system returned a partially correct answer citing 2BR pricing instead, I could immediately trace the gap to the retrieval stage rather than accepting a plausible-sounding response as correct. The spec made the failure visible.
+Writing the evaluation plan in `planning.md` before touching any code forced me to define what "correct" looks like for each query before I could accidentally tune the system to produce the answer I expected. Question 2 (Stoneridge maintenance) had a specific expected answer — "slow/inconsistent for non-urgent issues" — that I could check against the actual response. When the system returned a plausible-sounding answer that mixed in Gainesville Place reviews, the pre-written expected answer made the contamination obvious. Without the spec, a reader might have accepted the response as correct because it hedged appropriately. The spec made the failure visible.
 
 **One way the implementation diverged from the spec, and why:**
 
