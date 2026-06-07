@@ -319,11 +319,7 @@ HTML = """<!DOCTYPE html>
     </div>
     <!-- Chips hidden after first message -->
     <div class="chips" id="chips">
-      <span class="chip" onclick="setQuery(this)"
-        data-query="Which RTS bus routes serve apartments on the SW 34th Street corridor?">
-        Bus routes on 34th Street
-      </span>
-      <span class="chip" onclick="setQuery(this)"
+<span class="chip" onclick="setQuery(this)"
         data-query="What is the typical monthly rent per person for a 4-bedroom apartment near UF campus in Gainesville?">
         Rent for a 4-bedroom near UF
       </span>
